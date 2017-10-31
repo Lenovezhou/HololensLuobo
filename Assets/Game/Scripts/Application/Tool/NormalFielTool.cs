@@ -18,7 +18,7 @@ public class NormalFielTool : AbstractFielTool
         }
     }
     //填充Level类数据
-    public static void FillLevel(string fileName, ref Level level)
+    public override void FillLevel(string fileName, ref Level level)
     {
         FileInfo file = new FileInfo(fileName);
         StreamReader sr = new StreamReader(file.OpenRead(), Encoding.UTF8);
@@ -75,9 +75,10 @@ public class NormalFielTool : AbstractFielTool
     }
 
     //读取关卡列表
-    public static List<FileInfo> GetLevelFiles()
+    public override List<FileInfo> GetLevelFiles() 
     {
-        string[] files = Directory.GetFiles(Consts.LevelDir, "*.xml");
+    
+    string[] files = Directory.GetFiles(Consts.LevelDir, "*.xml");
 
         List<FileInfo> list = new List<FileInfo>();
         for (int i = 0; i < files.Length; i++)
@@ -87,5 +88,9 @@ public class NormalFielTool : AbstractFielTool
         }
         return list;
     }
+
+
+
+
 
 }

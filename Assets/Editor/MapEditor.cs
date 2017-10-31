@@ -4,11 +4,11 @@ using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 
-[CustomEditor(typeof(Map))]
+[CustomEditor(typeof(MapController))]
 public class MapEditor : Editor
 {
     [HideInInspector]
-    public Map Map = null;
+    public MapController Map = null;
 
     //关卡列表
     List<FileInfo> m_files = new List<FileInfo>();
@@ -23,7 +23,7 @@ public class MapEditor : Editor
         if(Application.isPlaying)
         {
             //关联的Mono脚本组件
-            Map = target as Map;
+            Map = target as MapController;
 
             EditorGUILayout.BeginHorizontal();
             int currentIndex = EditorGUILayout.Popup(m_selectIndex, GetNames(m_files));
@@ -44,18 +44,18 @@ public class MapEditor : Editor
             EditorGUILayout.BeginHorizontal();
             if (GUILayout.Button("清除塔点"))
             {
-                Map.ClearHolder();
+                //Map.ClearHolder();
             }
             if (GUILayout.Button("清除路径"))
             {
-                Map.ClearRoad();
+               // Map.ClearRoad();
             }
             EditorGUILayout.EndHorizontal();
 
             if (GUILayout.Button("保存数据"))
             {
                 //保存关卡
-                SaveLevel();
+                //SaveLevel();
             }
         }
 
@@ -69,7 +69,7 @@ public class MapEditor : Editor
         Clear();
 
         //加载列表
-        m_files = FielsFactory.CreatFielTool();
+        m_files = FielsFactory.CreatFielTool().GetLevelFiles();
 
         //默认加载第一个关卡
         if (m_files.Count > 0)
@@ -84,51 +84,53 @@ public class MapEditor : Editor
         FileInfo file = m_files[m_selectIndex];
 
         Level level = new Level();
-        Tools.FillLevel(file.FullName, ref level);
+        FielsFactory.CreatFielTool().FillLevel(file.FullName, ref level);
+        //Tools.FillLevel(file.FullName, ref level);
 
         Map.LoadLevel(level);
     }
 
-    void SaveLevel()
-    {
-        //获取当前加载的关卡
-        Level level = Map.Level;
+    //void SaveLevel()
+    //{
+    //    //获取当前加载的关卡
+    //    Level level = Map.Level;
 
-        //临时索引点
-        List<Point> list = null;
+    //    //临时索引点
+    //    List<Point> list = null;
 
-        //收集放塔点
-        list = new List<Point>();
-        for (int i = 0; i < Map.Grid.Count; i++)
-        {
-            Tile t = Map.Grid[i];
-            if (t.CanHold)
-            {
-                Point p = new Point(t.X, t.Y);
-                list.Add(p);
-            }
-        }
-        level.Holder = list;
+    //    //收集放塔点
+    //    list = new List<Point>();
+    //    for (int i = 0; i < Map.Grid.Count; i++)
+    //    {
+    //        Tile t = Map.Grid[i];
+    //        if (t.CanHold)
+    //        {
+    //            Point p = new Point(t.X, t.Y);
+    //            list.Add(p);
+    //        }
+    //    }
+    //    level.Holder = list;
 
-        //收集寻路点
-        list = new List<Point>();
-        for (int i = 0; i < Map.Road.Count; i++)
-        {
-            Tile t = Map.Road[i];
-            Point p = new Point(t.X, t.Y);
-            list.Add(p);
-        }
-        level.Path = list;
+    //    //收集寻路点
+    //    list = new List<Point>();
+    //    for (int i = 0; i < Map.Road.Count; i++)
+    //    {
+    //        Tile t = Map.Road[i];
+    //        Point p = new Point(t.X, t.Y);
+    //        list.Add(p);
+    //    }
+    //    level.Path = list;
 
-        //路径
-        string fileName = m_files[m_selectIndex].FullName;
+    //    //路径
+    //    string fileName = m_files[m_selectIndex].FullName;
 
-        //保存关卡
-        Tools.SaveLevel(fileName, level);
+    //    //保存关卡
+    //    FielsFactory.CreatFielTool().SaveLevel(fileName,level);
+    //    //Tools.SaveLevel(fileName, level);
 
-        //弹框提示
-        EditorUtility.DisplayDialog("保存关卡数据", "保存成功", "确定");
-    }
+    //    //弹框提示
+    //    EditorUtility.DisplayDialog("保存关卡数据", "保存成功", "确定");
+    //}
 
     void Clear()
     {
