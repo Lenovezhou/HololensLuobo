@@ -18,6 +18,8 @@ public class NormalFielTool : AbstractFielTool
         }
     }
     //填充Level类数据
+#if UNITY_EDITOR
+
     public override void FillLevel(string fileName, ref Level level)
     {
         FileInfo file = new FileInfo(fileName);
@@ -89,7 +91,7 @@ public class NormalFielTool : AbstractFielTool
         return list;
     }
 
-
+#endif
 
 
 

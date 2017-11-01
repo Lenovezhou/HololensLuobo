@@ -11,6 +11,7 @@ public class FielsFactory
 #if UNITY_EDITOR
         return new NormalFielTool();
 #else
+        //return new NormalFielTool();
         return new UWPFielTool();
 #endif
     }
