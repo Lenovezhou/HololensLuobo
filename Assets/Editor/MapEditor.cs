@@ -85,7 +85,6 @@ public class MapEditor : Editor
 
         Level level = new Level();
         FielsFactory.CreatFielTool().FillLevel(file.FullName, ref level);
-        //Tools.FillLevel(file.FullName, ref level);
 
         Map.LoadLevel(level);
     }

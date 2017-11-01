@@ -3,18 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-//鼠标点击参数类
-public class TileClickEventArgs : EventArgs
-{
-    public int MouseButton; //0左键，1右键
-    public Tile Tile;
-
-    public TileClickEventArgs(int mouseButton, Tile tile)
-    {
-        this.MouseButton = mouseButton;
-        this.Tile = tile;
-    }
-}
+    
 
 //用于描述一个关卡地图的状态
 public class Map : MonoBehaviour

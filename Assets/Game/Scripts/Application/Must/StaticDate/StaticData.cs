@@ -5,7 +5,7 @@ using HoloToolkit.Unity;
 
 public class StaticData : Singleton<StaticData>
 {
-    //Dictionary<int, LuoboInfo> m_Luobos = new Dictionary<int, LuoboInfo>();
+    Dictionary<int, LuoboInfo> m_Luobos = new Dictionary<int, LuoboInfo>();
     Dictionary<int, MonsterInfo> m_Monsters = new Dictionary<int, MonsterInfo>();
     //Dictionary<int, TowerInfo> m_Towers = new Dictionary<int, TowerInfo>();
     //Dictionary<int, BulletInfo> m_Bullets = new Dictionary<int, BulletInfo>();
@@ -21,7 +21,7 @@ public class StaticData : Singleton<StaticData>
 
     void InitLuobos()
     {
-        //m_Luobos.Add(0, new LuoboInfo() { ID = 0, Hp = 2 });
+        m_Luobos.Add(0, new LuoboInfo() { ID = 0, Hp = 2 });
     }
 
     void InitMonsters()
@@ -46,10 +46,10 @@ public class StaticData : Singleton<StaticData>
         //m_Bullets.Add(1, new BulletInfo() { ID = 1, PrefabName = "FanBullet", BaseSpeed = 2f, BaseAttack = 1 });
     }
 
-    //public LuoboInfo GetLuoboInfo()
-    //{
-    //    return m_Luobos[0];
-    //}
+    public LuoboInfo GetLuoboInfo()
+    {
+        return m_Luobos[0];
+    }
 
     public MonsterInfo GetMonsterInfo(int monsterID)
     {

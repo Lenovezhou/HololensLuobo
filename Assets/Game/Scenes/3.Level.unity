@@ -581,7 +581,7 @@ Prefab:
     m_Modifications:
     - target: {fileID: 4827992513995246, guid: 34090fe54f7645945beff6752dbca734, type: 2}
       propertyPath: m_LocalPosition.x
-      value: -6
+      value: -0.2
       objectReference: {fileID: 0}
     - target: {fileID: 4827992513995246, guid: 34090fe54f7645945beff6752dbca734, type: 2}
       propertyPath: m_LocalPosition.y
@@ -609,6 +609,11 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4827992513995246, guid: 34090fe54f7645945beff6752dbca734, type: 2}
       propertyPath: m_RootOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 212479199517678614, guid: 34090fe54f7645945beff6752dbca734,
+        type: 2}
+      propertyPath: m_SortingOrder
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -1877,7 +1882,7 @@ Canvas:
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 25
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 20
   m_TargetDisplay: 0
 --- !u!224 &1405932908
 RectTransform:
