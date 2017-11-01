@@ -1,6 +1,5 @@
 ﻿
 using UnityEngine;
-using System.Xml;
 using System.Text;
 using System.Collections.Generic;
 using System.IO;
@@ -8,12 +7,14 @@ using System.IO;
 
 //利用宏定义区分Unity3D与UWP的引用空间
 #if NETFX_CORE
+using Windows.Data.Xml.Dom;
 using Windows.Storage;
 using XmlReader = WinRTLegacy.Xml.XmlReader;
 using XmlWriter = WinRTLegacy.Xml.XmlWriter;
 using StreamWriter = WinRTLegacy.IO.StreamWriter;
 using StreamReader = WinRTLegacy.IO.StreamReader;
 #else
+using System.Xml;
 using XmlReader = System.Xml.XmlReader;
 using XmlWriter = System.Xml.XmlWriter;
 using StreamWriter = System.IO.StreamWriter;
@@ -21,56 +22,68 @@ using StreamReader = System.IO.StreamReader;
 #endif
 
 
-public class UWPFielTool:AbstractFielTool
+public class UWPFielTool : AbstractFielTool
 {
-
-    private List<Level> levels = new List<Level>();
-
-//#if NETFX_CORE
-//    public async void GetAsyncFiels()
-//    {
-//        StorageFolder picturesFolder = KnownFolders.PicturesLibrary;
-//        StringBuilder outputText = new StringBuilder();
-
-//        IReadOnlyList<IStorageItem> itemsList = await picturesFolder.GetItemsAsync();
-//        for (int i = 0; i<itemsList.Length; i++)
-//		{
-//            Level level = new Level();
-//            FillLevel(files[i].FullName, ref level);
-//            levels.add(level);
-//		}
-//    }
-//#endif
-
-
-    public override void FillLevel(ref List<Level> _levels)
+   
+    public override void FillLevel(ref List<Level> levels)
     {
+        for (int i = 0; i < 5; i++)
+        {
+            string path ="level" + i + ".xml";//"file://"+ Consts.LevelDir + @"\level" + i + ".xml";
+            Level l = new Level();
+#if NETFX_CORE
+            ReadData(path,l);
+#endif
+            levels.Add(l);
+        }
+    }
 
 #if NETFX_CORE
-        awit GetAsyncFiels();
-        _levels = level;
-#else
-        List<FileInfo> files = GetLevelFiles();
-        for (int i = 0; i < files.Count; i++)
-        {
-            Level level = new Level();
-            FillLevel(files[i].FullName, ref level);
-            _levels.Add(level);
-        }
-#endif
+
+    //private async void LoadLoalXML(string filename, Level l)
+    //{
+    //    StorageFolder docLib = await KnownFolders.DocumentsLibrary.GetFolderAsync("Data");
+    //    StorageFile docFile = await docLib.GetFileAsync(filename);
+    //    string s;
+    //    using (Stream fs = await docFile.OpenStreamForReadAsync())
+    //    {
+    //        byte[] byData = new byte[fs.Length];
+    //        fs.Read(byData, 0, (int)fs.Length);
+    //        s = System.Text.Encoding.UTF8.GetString(byData);
+    //    }
+    //    Read(s,ref l);
+    //}
+
+
+
+    /// <summary>
+    ///Hololens读取浏览器上的文件
+    /// </summary>
+    private async void ReadData(string fielname,Level l)
+    {
+        StorageFolder docLib = ApplicationData.Current.LocalFolder;
+        // var docFile = docLib.OpenStreamForReadAsync("\\Test20170815.txt");
+        // 获取应用程序数据存储文件夹
+
+        Stream stream = await docLib.OpenStreamForReadAsync("\\" + fielname);
+
+        // 获取指定的文件的文本内容
+        byte[] content = new byte[stream.Length];
+        await stream.ReadAsync(content, 0, (int)stream.Length);
+
+        string result = Encoding.UTF8.GetString(content, 0, content.Length);
+
+        Read(result,ref l);
+
     }
 
 
-#if UNITY_EDITOR
-    //填充Level类数据
-    public override void FillLevel(string fileName, ref Level level)
+
+    void Read(string _xml ,ref Level level)
     {
-        //FileInfo file = new FileInfo(fileName);
-        //StreamReader sr = new StreamReader(file.OpenRead(), Encoding.UTF8);
 
         XmlDocument doc = new XmlDocument();
-        doc.Load(fileName);
-        //doc.Load(sr);
+        doc.LoadXml(_xml);
 
         level.Name = doc.SelectSingleNode("/Level/Name").InnerText;
         level.CardImage = doc.SelectSingleNode("/Level/CardImage").InnerText;
@@ -83,10 +96,22 @@ public class UWPFielTool:AbstractFielTool
         nodes = doc.SelectNodes("/Level/Holder/Point");
         for (int i = 0; i < nodes.Count; i++)
         {
-            XmlNode node = nodes[i];
-            Point p = new Point(
-                int.Parse(node.Attributes["X"].Value),
-                int.Parse(node.Attributes["Y"].Value));
+            IXmlNode node = nodes[i];
+            int x = 0, y = 0;
+            foreach (var attribute in node.Attributes)
+            {
+                if (attribute.NodeName == "X")
+                {
+                    x = int.Parse(attribute.InnerText);
+                }
+
+                if (attribute.NodeName == "Y")
+                {
+                    y = int.Parse(attribute.InnerText);
+                }
+            }
+
+            Point p = new Point(x,y);
 
             level.Holder.Add(p);
         }
@@ -94,11 +119,22 @@ public class UWPFielTool:AbstractFielTool
         nodes = doc.SelectNodes("/Level/Path/Point");
         for (int i = 0; i < nodes.Count; i++)
         {
-            XmlNode node = nodes[i];
+            IXmlNode node = nodes[i];
+            int x = 0, y = 0;
+            foreach (var attribute in node.Attributes)
+            {
+                if (attribute.NodeName == "X")
+                {
+                    x = int.Parse(attribute.InnerText);
+                }
 
-            Point p = new Point(
-                int.Parse(node.Attributes["X"].Value),
-                int.Parse(node.Attributes["Y"].Value));
+                if (attribute.NodeName == "Y")
+                {
+                    y = int.Parse(attribute.InnerText);
+                }
+            }
+
+            Point p = new Point(x,y);
 
             level.Path.Add(p);
         }
@@ -106,38 +142,30 @@ public class UWPFielTool:AbstractFielTool
         nodes = doc.SelectNodes("/Level/Rounds/Round");
         for (int i = 0; i < nodes.Count; i++)
         {
-            XmlNode node = nodes[i];
+            IXmlNode node = nodes[i];
+            int x = 0, y = 0;
+            foreach (var attribute in node.Attributes)
+            {
+                if (attribute.NodeName == "Monster")
+                {
+                    x = int.Parse(attribute.InnerText);
+                }
 
-            Round r = new Round(
-                    int.Parse(node.Attributes["Monster"].Value),
-                    int.Parse(node.Attributes["Count"].Value)
-                );
+                if (attribute.NodeName == "Count")
+                {
+                    y = int.Parse(attribute.InnerText);
+                }
+            }
+
+            Round r = new Round(x,y);
 
             level.Rounds.Add(r);
         }
-
-        //sr.Close();
-        //sr.Dispose();
     }
 
 
-
-
-    //读取关卡列表
-    public override List<FileInfo> GetLevelFiles()
-    {
-
-        string[] files = Directory.GetFiles(Consts.LevelDir, "*.xml");
-
-        List<FileInfo> list = new List<FileInfo>();
-        for (int i = 0; i < files.Length; i++)
-        {
-            FileInfo file = new FileInfo(files[i]);
-            list.Add(file);
-        }
-        return list;
-    }
 
 #endif
+
 
 }

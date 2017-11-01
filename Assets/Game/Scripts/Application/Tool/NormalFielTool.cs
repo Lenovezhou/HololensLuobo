@@ -9,6 +9,8 @@ public class NormalFielTool : AbstractFielTool
 {
     public override void FillLevel(ref List<Level> levels)
     {
+        #if !NETFX_CORE
+
         List<FileInfo> files = GetLevelFiles();
         for (int i = 0; i < files.Count; i++)
         {
@@ -16,6 +18,7 @@ public class NormalFielTool : AbstractFielTool
             FillLevel(files[i].FullName, ref level);
             levels.Add(level);
         }
+        #endif
     }
     //填充Level类数据
 #if UNITY_EDITOR
