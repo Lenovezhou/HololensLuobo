@@ -16,7 +16,7 @@ class EndLevelCommand : Controller
 
         //停止游戏
         gm.EndLevel(e.IsSuccess);
-
+        
         Game.Instance._ObjectPool.UnspawnAll();
         //胜利
         if (e.IsSuccess)

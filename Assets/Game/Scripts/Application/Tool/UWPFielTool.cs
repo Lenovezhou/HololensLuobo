@@ -3,6 +3,9 @@ using UnityEngine;
 using System.Text;
 using System.Collections.Generic;
 using System.IO;
+using System.Collections;
+using UnityEngine.UI;
+using System;
 
 
 //利用宏定义区分Unity3D与UWP的引用空间
@@ -24,75 +27,48 @@ using StreamReader = System.IO.StreamReader;
 
 public class UWPFielTool : AbstractFielTool
 {
-   
-    public override void FillLevel(ref List<Level> levels)
+    List<Level> levels = new List<Level>();
+
+    public override void FillLevel(Action<Level> callback)
     {
+#if NETFX_CORE
         for (int i = 0; i < 5; i++)
         {
-            string path ="level" + i + ".xml";//"file://"+ Consts.LevelDir + @"\level" + i + ".xml";
-            Level l = new Level();
-#if NETFX_CORE
-            ReadData(path,l);
-#endif
-            levels.Add(l);
+            ReadData("level" + i + ".xml", callback);
         }
+#endif
     }
 
 #if NETFX_CORE
 
-    //private async void LoadLoalXML(string filename, Level l)
-    //{
-    //    StorageFolder docLib = await KnownFolders.DocumentsLibrary.GetFolderAsync("Data");
-    //    StorageFile docFile = await docLib.GetFileAsync(filename);
-    //    string s;
-    //    using (Stream fs = await docFile.OpenStreamForReadAsync())
-    //    {
-    //        byte[] byData = new byte[fs.Length];
-    //        fs.Read(byData, 0, (int)fs.Length);
-    //        s = System.Text.Encoding.UTF8.GetString(byData);
-    //    }
-    //    Read(s,ref l);
-    //}
-
-
-
-    /// <summary>
-    ///Hololens读取浏览器上的文件
-    /// </summary>
-    private async void ReadData(string fielname,Level l)
+    private async void ReadData(string fielname, Action<Level> callback)
     {
         StorageFolder docLib = ApplicationData.Current.LocalFolder;
-        // var docFile = docLib.OpenStreamForReadAsync("\\Test20170815.txt");
-        // 获取应用程序数据存储文件夹
-
         Stream stream = await docLib.OpenStreamForReadAsync("\\" + fielname);
-
         // 获取指定的文件的文本内容
         byte[] content = new byte[stream.Length];
         await stream.ReadAsync(content, 0, (int)stream.Length);
-
+        stream.Dispose();
         string result = Encoding.UTF8.GetString(content, 0, content.Length);
 
-        Read(result,ref l);
-
+        ReadXML(result, callback);
     }
 
-
-
-    void Read(string _xml ,ref Level level)
+    void ReadXML(string _xml, Action<Level> callback)
     {
-
         XmlDocument doc = new XmlDocument();
-        doc.LoadXml(_xml);
+        string str = _xml;
+        doc.LoadXml(str);
 
-        level.Name = doc.SelectSingleNode("/Level/Name").InnerText;
-        level.CardImage = doc.SelectSingleNode("/Level/CardImage").InnerText;
-        level.Background = doc.SelectSingleNode("/Level/Background").InnerText;
-        level.Road = doc.SelectSingleNode("/Level/Road").InnerText;
-        level.InitScore = int.Parse(doc.SelectSingleNode("/Level/InitScore").InnerText);
-
+        Level level = new Level
+        {
+            Name = doc.SelectSingleNode("/Level/Name").InnerText,
+            CardImage = doc.SelectSingleNode("/Level/CardImage").InnerText,
+            Background = doc.SelectSingleNode("/Level/Background").InnerText,
+            Road = doc.SelectSingleNode("/Level/Road").InnerText,
+            InitScore = int.Parse(doc.SelectSingleNode("/Level/InitScore").InnerText)
+        };
         XmlNodeList nodes;
-
         nodes = doc.SelectNodes("/Level/Holder/Point");
         for (int i = 0; i < nodes.Count; i++)
         {
@@ -104,18 +80,14 @@ public class UWPFielTool : AbstractFielTool
                 {
                     x = int.Parse(attribute.InnerText);
                 }
-
-                if (attribute.NodeName == "Y")
+                else
                 {
                     y = int.Parse(attribute.InnerText);
                 }
             }
-
-            Point p = new Point(x,y);
-
+            Point p = new Point(x, y);
             level.Holder.Add(p);
         }
-
         nodes = doc.SelectNodes("/Level/Path/Point");
         for (int i = 0; i < nodes.Count; i++)
         {
@@ -127,18 +99,14 @@ public class UWPFielTool : AbstractFielTool
                 {
                     x = int.Parse(attribute.InnerText);
                 }
-
-                if (attribute.NodeName == "Y")
+                else
                 {
                     y = int.Parse(attribute.InnerText);
                 }
             }
-
-            Point p = new Point(x,y);
-
+            Point p = new Point(x, y);
             level.Path.Add(p);
         }
-
         nodes = doc.SelectNodes("/Level/Rounds/Round");
         for (int i = 0; i < nodes.Count; i++)
         {
@@ -150,22 +118,34 @@ public class UWPFielTool : AbstractFielTool
                 {
                     x = int.Parse(attribute.InnerText);
                 }
-
-                if (attribute.NodeName == "Count")
+                else
                 {
                     y = int.Parse(attribute.InnerText);
                 }
             }
+            Round r = new Round(x, y);
 
-            Round r = new Round(x,y);
+
 
             level.Rounds.Add(r);
+
         }
+
+        callback?.Invoke(level);
+
     }
-
-
-
 #endif
 
+
+
+    public override void LoadImage(string url, Action<Sprite> callback)
+    {
+
+        string path = url.Split('.')[0];
+
+        Sprite sp = Resources.Load<Sprite>(path);
+
+        callback(sp);
+    }
 
 }

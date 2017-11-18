@@ -316,6 +316,7 @@ namespace HoloToolkit.Examples.SpatialUnderstandingFeatureOverview
                         Color.blue,
                         (resultsShape[i].halfDims.sqrMagnitude < 0.01f) ? defaultHalfDims : resultsShape[i].halfDims)
                 );
+                Debug.Log("resultsShape[i].position-->>" + resultsShape[i].position +"<<--halfsize"+ ((resultsShape[i].halfDims.sqrMagnitude < 0.01f) ? defaultHalfDims : resultsShape[i].halfDims));
                 ++boxesDisplayed;
             }
 

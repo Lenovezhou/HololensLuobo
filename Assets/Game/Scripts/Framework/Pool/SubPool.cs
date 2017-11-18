@@ -30,7 +30,7 @@ public class SubPool
 
         foreach (GameObject obj in m_objects)
         {
-            if (!obj.activeSelf)
+            if (obj && !obj.activeSelf)
             {
                 go = obj;
                 break;
@@ -63,7 +63,7 @@ public class SubPool
     {
         foreach(GameObject item in m_objects)
         {
-            if (item.activeSelf)
+            if (item && item.activeSelf)
             {
                 Unspawn(item);
             }

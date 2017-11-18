@@ -16,7 +16,8 @@ class StartLevelCommand : Controller
         //第二步
         RoundModel rm = GetModel<RoundModel>();
         rm.LoadLevel(gm.PlayLevel);
-
+        rm.IsPlaying = true;
+        
         //进入游戏
         Game.Instance.LoadScene(3);
 

@@ -7,7 +7,7 @@ using UnityEngine;
 public class Monster : Role
 {
     #region 常量
-    public const float CLOSED_DISTANCE = 2f;
+    public const float CLOSED_DISTANCE = 0.01f;
     #endregion
 
     #region 事件
@@ -15,6 +15,8 @@ public class Monster : Role
     #endregion
 
     #region 字段
+    public int Price { get; set; }
+
     public MonsterType MonsterType = MonsterType.Monster0;//怪物类型
     float m_MoveSpeed;//移动速度（米/秒）
     Vector3[] m_Path = null; //路径拐点
@@ -116,8 +118,8 @@ public class Monster : Role
         MonsterInfo info = Game.Instance._StaticDate.GetMonsterInfo((int)MonsterType);
         this.MaxHp = info.Hp;
         this.Hp = info.Hp;
-        this.MoveSpeed = info.MoveSpeed;
-
+        this.MoveSpeed =info.MoveSpeed;
+        this.Price = info.Price;
     }
 
     public override void OnUnspawn()
@@ -132,6 +134,4 @@ public class Monster : Role
     }
     #endregion
 
-    #region 帮助方法
-    #endregion
 }       

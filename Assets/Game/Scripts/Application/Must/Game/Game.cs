@@ -8,6 +8,9 @@ using System.Collections;
 public class Game : ApplicationBase
 {
     #region 全局字段
+
+    private GameObject light;
+
     //全局访问功能
     public override ObjectPool _ObjectPool
     {
@@ -45,6 +48,7 @@ public class Game : ApplicationBase
     [HideInInspector]
     public GameObject Cursor;//光标
 
+    private TextMesh debugger;
 #endregion
     //全局方法
     public override void LoadScene(int level)
@@ -61,10 +65,19 @@ public class Game : ApplicationBase
         SceneManager.LoadScene(level, LoadSceneMode.Single);
     }
 
+
+    public override void WriteInHololens(string message)
+    {
+        debugger.text += message + "\r\n";
+    }
+
+    public override void SetGameTimeScale(int scale)
+    {
+        Time.timeScale = scale;
+    }
+
     void OnLevelWasLoaded(int level)
     {
-        Debug.Log("OnLevelWasLoaded:" + level);
-
         //事件参数
         SceneArgs e = new SceneArgs();
         e.SceneIndex = level;
@@ -81,9 +94,13 @@ public class Game : ApplicationBase
         //全局单例赋值
         HololensCamera = Camera.main.gameObject;
         Cursor = GameObject.Find("InteractiveMeshCursor");
+        light = GameObject.Find("Directional light");
+        debugger = GameObject.Find("FPSDisplay").GetComponentInChildren<TextMesh>();
 
+        Object.DontDestroyOnLoad(light);
         Object.DontDestroyOnLoad(HololensCamera);
         Object.DontDestroyOnLoad(Cursor);
+        Object.DontDestroyOnLoad(GameObject.Find("FPSDisplay"));
 
         //注册启动命令
         RegisterController(Consts.E_StartUp, typeof(StartUpCommand));
@@ -91,4 +108,6 @@ public class Game : ApplicationBase
         //启动游戏
         SendEvent(Consts.E_StartUp);
     }
+
+   
 }

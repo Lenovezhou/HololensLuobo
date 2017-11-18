@@ -83,10 +83,10 @@ public class MapEditor : Editor
     {
         FileInfo file = m_files[m_selectIndex];
 
-        Level level = new Level();
-        FielsFactory.CreatFielTool().FillLevel(file.FullName, ref level);
+        //Level level = new Level();
+        FielsFactory.CreatFielTool().FillLevel(file.FullName,(level)=> { Map.LoadLevel(level); });
 
-        Map.LoadLevel(level);
+        
     }
 
     //void SaveLevel()

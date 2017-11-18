@@ -23,9 +23,13 @@ public class UICountDown : View
         switch (eventName)
         {
             case Consts.E_EnterScene:
-                ShowOrHide(true);
-                StartCoroutine(StartCountDown());
-                StartCoroutine(TurnAround());
+                SceneArgs sa = data as SceneArgs;
+                if (sa.SceneIndex == 3)
+                {
+                    ShowOrHide(true);
+                    StartCoroutine(StartCountDown());
+                    StartCoroutine(TurnAround());
+                }
                 break;
             default:
                 break;
@@ -63,6 +67,13 @@ public class UICountDown : View
             Count.overrideSprite = Numbers[index -1];
             index--;
             yield return new WaitForSeconds(1);
+
+            GameModel gm = GetModel<GameModel>();
+            while (!gm.IsPlaying)
+            {
+                yield return new WaitForFixedUpdate();
+            }
+
             if (index <= 0)
                 break;
         }
@@ -73,7 +84,7 @@ public class UICountDown : View
 
     void ShowOrHide(bool isshow)
     {
-       gameObject.SetActive(isshow);
+        gameObject.SetActive(isshow);
     }
 
 

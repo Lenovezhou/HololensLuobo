@@ -1,35 +1,38 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml;
+using UnityEngine;
+using UnityEngine.UI;
 
 public class NormalFielTool : AbstractFielTool
 {
-    public override void FillLevel(ref List<Level> levels)
+    public override void FillLevel(Action<Level> callback)
     {
-        #if !NETFX_CORE
+        #if UNITY_EDITOR
 
         List<FileInfo> files = GetLevelFiles();
         for (int i = 0; i < files.Count; i++)
         {
-            Level level = new Level();
-            FillLevel(files[i].FullName, ref level);
-            levels.Add(level);
+            FillLevel(files[i].FullName, callback);
         }
         #endif
     }
     //填充Level类数据
 #if UNITY_EDITOR
 
-    public override void FillLevel(string fileName, ref Level level)
+    public override void FillLevel(string fileName, Action<Level> callback)
     {
         FileInfo file = new FileInfo(fileName);
         StreamReader sr = new StreamReader(file.OpenRead(), Encoding.UTF8);
 
         XmlDocument doc = new XmlDocument();
         doc.Load(sr);
+
+        Level level = new Level();
 
         level.Name = doc.SelectSingleNode("/Level/Name").InnerText;
         level.CardImage = doc.SelectSingleNode("/Level/CardImage").InnerText;
@@ -75,6 +78,8 @@ public class NormalFielTool : AbstractFielTool
             level.Rounds.Add(r);
         }
 
+        callback(level);
+
         sr.Close();
         sr.Dispose();
     }
@@ -94,8 +99,34 @@ public class NormalFielTool : AbstractFielTool
         return list;
     }
 
+
+
+
 #endif
 
+    public override void LoadImage(string url, Action<Sprite> callback)
+    {
+#if UNITY_EDITOR
+        Game.Instance.StartCoroutine(Load_Image(url, callback));
+#endif
+    }
+
+
+    public IEnumerator Load_Image(string url, Action<Sprite> callback)
+    {
+        WWW www = new WWW(url);
+        while (!www.isDone)
+            yield return www;
+
+        Texture2D texture = www.texture;
+        Sprite sp = Sprite.Create(
+            texture,
+            new Rect(0, 0, texture.width, texture.height),
+            new Vector2(0.5f, 0.5f));
+        callback(sp);
+
+
+    }
 
 
 }

@@ -8,6 +8,7 @@ public class Tile
 {
     public int X;
     public int Y;
+    public bool IsSeted = false;
     public bool CanHold; //是否可以放置塔
     public object Data; //格子所保存的数据
 

@@ -9,6 +9,8 @@ public class RoundModel : Model {
     List<Round> m_Rounds = new List<Round>();//该关卡所有的出怪信息
     int m_RoundIndex = -1; //当前回合的索引
 
+    bool isPlaying = false;
+
     //生成怪物协程
     Coroutine c;
 
@@ -33,7 +35,8 @@ public class RoundModel : Model {
 
     public void StopRound()
     {
-        Game.Instance.StopCoroutine(c);
+        if(null != c)
+            Game.Instance.StopCoroutine(c);
     }
 
     public int RoundIndex
@@ -49,6 +52,19 @@ public class RoundModel : Model {
     public bool AllRoundsComplete
     {
         get { return m_AllRoundsComplete; }
+    }
+
+    public bool IsPlaying
+    {
+        get
+        {
+            return isPlaying;
+        }
+
+        set
+        {
+            isPlaying = value;
+        }
     }
 
 
@@ -81,6 +97,11 @@ public class RoundModel : Model {
             {
                 //出怪间隙
                 yield return new WaitForSeconds(SPAWN_INTERVAL);
+
+                while (!IsPlaying)
+                {
+                    yield return new WaitForFixedUpdate();
+                }
 
                 //出怪事件
                 SpawnMonsterArgs ee = new SpawnMonsterArgs();

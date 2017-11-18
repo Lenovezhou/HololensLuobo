@@ -1,7 +1,10 @@
-﻿using System;
+﻿using HoloToolkit.Unity.InputModule;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
+
 
 //鼠标点击参数类
 public class TileClickEventArgs : EventArgs
@@ -16,7 +19,8 @@ public class TileClickEventArgs : EventArgs
     }
 }
 
-public class MapController : MonoBehaviour {
+public class MapController : MonoBehaviour, IInputClickHandler
+{
 
 
     #region 常量
@@ -46,6 +50,9 @@ public class MapController : MonoBehaviour {
     float TileWidth;//格子宽
     float TileHeight;//格子高
 
+    Tile lasthit;
+    GameObject lasthiticorn;
+
     #endregion
 
 
@@ -70,6 +77,11 @@ public class MapController : MonoBehaviour {
     public Level Level
     {
         get { return m_level; }
+    }
+
+    public Rect MapRect
+    {
+        get { return new Rect((-MapWidth / 2)+transform.position.x, (-MapHeight / 2)+transform.position.y, MapWidth, MapHeight); }
     }
 
     #endregion
@@ -151,6 +163,7 @@ public class MapController : MonoBehaviour {
     //获取所在位置获得格子
     public Tile GetTile(Vector3 position)
     {
+        position -= transform.position;
         int tileX = (int)((position.x + MapWidth / 2) / TileWidth);
         int tileY = (int)((position.y + MapHeight / 2) / TileHeight);
         return GetTile(tileX, tileY);
@@ -180,12 +193,12 @@ public class MapController : MonoBehaviour {
     //获取格子中心点所在的世界坐标
     public Vector3 GetPosition(Tile t)
     {
-        Vector3 pos = background.transform.position;
+        Vector3 mappos = transform.position;
         //return pos;
         return new Vector3(
-                -MapWidth / 2 + (t.X + 0.5f) * TileWidth,
-                -MapHeight / 2 + (t.Y + 0.5f) * TileHeight,
-                background.transform.position.z
+                -MapWidth / 2 + (t.X + 0.5f) * TileWidth + mappos.x,
+                -MapHeight / 2 + (t.Y + 0.5f) * TileHeight + mappos.y,
+                mappos.z
             );
     }
 
@@ -193,7 +206,9 @@ public class MapController : MonoBehaviour {
     {
         //当前场景不是LevelBuilder不能编辑
         if (gameObject.scene.name != "LevelBuilder")
+        {
             return;
+        }
 
         if (Level == null)
             return;
@@ -214,32 +229,53 @@ public class MapController : MonoBehaviour {
         }
     }
 
-
     //获取鼠标下面的格子
     Tile GetTileUnderMouse()
     {
-        Vector2 wordPos = GetWorldPosition();
-        return GetTile(wordPos);
+        //Vector2 wordPos = GetWorldPosition();
+        //return GetTile(wordPos);
+        Vector3 wordPos = GetWorldPosition();
+        if (Vector3.zero != wordPos)
+        {
+            return GetTile(wordPos);
+        }
+        return null;
     }
 
     //获取鼠标所在位置的世界坐标
     Vector3 GetWorldPosition()
     {
-        Vector3 viewPos = Camera.main.ScreenToViewportPoint(Input.mousePosition);
-        Vector3 worldPos = Camera.main.ViewportToWorldPoint(viewPos);
-        return worldPos;
+        //Vector3 viewPos = Camera.main.ScreenToViewportPoint(Input.mousePosition);
+        //Vector3 worldPos = Camera.main.ViewportToWorldPoint(viewPos);
+        //return worldPos;
+#if NETFX_CORE
+        Ray ray = new Ray(Camera.main.transform.position, Camera.main.transform.forward);
+#else
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+#endif
+        Debug.DrawRay(ray.origin, ray.direction * 700);
+        RaycastHit[] hits = Physics.RaycastAll(ray);
+
+        for (int i = 0; i < hits.Length; i++)
+        {
+            if (hits[i].collider.CompareTag("Map"))
+            {
+                return hits[i].point;
+            }
+        }
+        return Vector3.zero;
     }
 
-    #endregion
+#endregion
 
-    #region 事件
+#region 事件
     public event EventHandler<TileClickEventArgs> OnTileClick;
 
-    #endregion
+#endregion
 
 
 
-    #region Unity回调
+#region Unity回调
 
 
     void Awake()
@@ -260,19 +296,7 @@ public class MapController : MonoBehaviour {
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0))
-        {
-            TileClickEventArgs args = new TileClickEventArgs(0, GetTileUnderMouse());
-            OnTileClick(this, args);
-        }
-
-        if (Input.GetMouseButtonDown(1))
-        {
-            TileClickEventArgs args = new TileClickEventArgs(1, GetTileUnderMouse());
-            OnTileClick(this, args);
-
-        }
-
+        HitEventCreator();
     }
 
 
@@ -292,16 +316,16 @@ public class MapController : MonoBehaviour {
         //绘制行
         for (int row = 0; row <= RowCount; row++)
         {
-            Vector3 from = new Vector3(-MapWidth / 2, -MapHeight / 2 + row * TileHeight,background.transform.position.z);
-            Vector3 to = new Vector3(-MapWidth / 2 + MapWidth, -MapHeight / 2 + row * TileHeight,background.transform.position.z);
+            Vector3 from = new Vector3(-MapWidth / 2, -MapHeight / 2 + row * TileHeight,0) + transform.position;
+            Vector3 to = new Vector3(-MapWidth / 2 + MapWidth, -MapHeight / 2 + row * TileHeight,0) + transform.position;
             Gizmos.DrawLine(from, to);
         }
 
         //绘制列
         for (int col = 0; col <= ColumnCount; col++)
         {
-            Vector3 from = new Vector3(-MapWidth / 2 + col * TileWidth, MapHeight / 2, background.transform.position.z);
-            Vector3 to = new Vector3(-MapWidth / 2 + col * TileWidth, -MapHeight / 2, background.transform.position.z);
+            Vector3 from = new Vector3(-MapWidth / 2 + col * TileWidth, MapHeight / 2, 0) + transform.position;
+            Vector3 to = new Vector3(-MapWidth / 2 + col * TileWidth, -MapHeight / 2, 0) + transform.position;
             Gizmos.DrawLine(from, to);
         }
 
@@ -343,5 +367,44 @@ public class MapController : MonoBehaviour {
 
     }
 
-        #endregion
+
+    void HitEventCreator()
+    {
+#if !NETFX_CORE
+        if (Input.GetMouseButtonDown(0))
+        {
+            TileClickEventArgs args = new TileClickEventArgs(0, GetTileUnderMouse());
+            OnTileClick(this, args);
+            //HololensDebugger.Instance.WriteInHololensScene("args.Tile = " + args.Tile);
+        }
+
+        if (Input.GetMouseButtonDown(1))
+        {
+            TileClickEventArgs args = new TileClickEventArgs(1, GetTileUnderMouse());
+            OnTileClick(this, args);
+        }
+
+
+#endif
+
     }
+
+
+//    public void OnMouseDown()
+//    {
+//#if NETFX_CORE
+
+//        TileClickEventArgs args = new TileClickEventArgs(0, GetTileUnderMouse());
+//        OnTileClick(this, args);
+//#endif
+//    }
+
+    public void OnInputClicked(InputClickedEventData eventData)
+    {
+        TileClickEventArgs args = new TileClickEventArgs(0, GetTileUnderMouse());
+        OnTileClick(this, args);
+    }
+
+
+    #endregion
+}

@@ -29,7 +29,8 @@ class EnterSceneComand : Controller
                 RegisterView(GameObject.Find("Canvas").transform.Find("UICountDown").GetComponent<UICountDown>());
                 RegisterView(GameObject.Find("Canvas").transform.Find("UIWin").GetComponent<UIWin>());
                 RegisterView(GameObject.Find("Canvas").transform.Find("UILost").GetComponent<UILost>());
-                //RegisterView(GameObject.Find("Canvas").transform.Find("UISystem").GetComponent<UISystem>());
+                RegisterView(GameObject.Find("TowerPopUp").GetComponent<TowerPopUp>());
+                RegisterView(GameObject.Find("Canvas").transform.Find("UISystem").GetComponent<UISystem>());
                 break;
             case 4://Complete
                 //RegisterView(GameObject.Find("UIComplete").GetComponent<UIComplete>());
@@ -37,5 +38,6 @@ class EnterSceneComand : Controller
             default:
                 break;
         }
+
     }
 }

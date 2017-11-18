@@ -8,7 +8,9 @@ public class GameModel : Model
     private int m_PlayLevelIndex;
     private bool m_isPlaying;
     private List<Level> m_Levels = new List<Level>();
-
+    private int m_GameProgress;
+    private bool m_IsPlaying;
+    private int m_gold;
 
     #region 属性
     public override string Name
@@ -16,6 +18,24 @@ public class GameModel : Model
         get
         {
             return Consts.M_GameModel;
+        }
+    }
+
+    public int GameProgress
+    {
+        get { return m_GameProgress; }
+    }
+
+    public bool IsPlaying1
+    {
+        get
+        {
+            return m_IsPlaying;
+        }
+
+        set
+        {
+            m_IsPlaying = value;
         }
     }
 
@@ -27,17 +47,17 @@ public class GameModel : Model
 
     public void EndLevel(bool isSuccess)
     {
-        //if (isSuccess && PlayLevelIndex > GameProgress)
-        //{
-        //    //重新获取
-        //    m_GameProgress = PlayLevelIndex;
+        if (isSuccess && PlayLevelIndex > GameProgress)
+        {
+            //重新获取
+            m_GameProgress = PlayLevelIndex;
 
-        //    //保存
-        //    Saver.SetProgress(PlayLevelIndex);
-        //}
+            //保存
+            //Saver.SetProgress(PlayLevelIndex);
+        }
 
-        ////游戏停止状态
-        //m_IsPlaying = false;
+        //游戏停止状态
+        IsPlaying1 = false;
     }
 
     public bool IsPlaying
@@ -64,12 +84,24 @@ public class GameModel : Model
         }
     }
 
+    public int Gold
+    {
+        get { return m_gold; }
+        set
+        {
+            m_gold = value;
+            SendEvent(Consts.E_Gold, value);
+        }
+    }
+
+    public int LevelCount { get { return m_Levels.Count; } }
+
 
 
     #endregion
 
 
-#region 帮助方法
+    #region 帮助方法
     public void StartLevel(int levelIndex)
     {
         m_PlayLevelIndex = levelIndex;
@@ -84,7 +116,7 @@ public class GameModel : Model
 
         AbstractFielTool aft = FielsFactory.CreatFielTool();
 
-        aft.FillLevel(ref levels);
+        aft.FillLevel((level)=> { m_Levels.Add(level); });
 
         //List<FileInfo> files = Tools.GetLevelFiles();
         //for (int i = 0; i < files.Count; i++)
@@ -93,7 +125,8 @@ public class GameModel : Model
         //    Tools.FillLevel(files[i].FullName, ref level);
         //    levels.Add(level);
         //}
-        m_Levels = levels;
+
+        //m_Levels = levels;
 
         //读取游戏进度
         //m_GameProgress = Saver.GetProgress();

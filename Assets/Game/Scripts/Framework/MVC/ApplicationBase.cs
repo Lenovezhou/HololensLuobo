@@ -17,9 +17,12 @@ public abstract class ApplicationBase : Singleton<ApplicationBase>
         MVC.SendEvent(eventName, data);
     }
 
+    public abstract void SetGameTimeScale(int scale);
+
     public abstract void LoadScene(int index);
 
     public abstract ObjectPool _ObjectPool{get;}
     public abstract Sound _Sound { get; }
     public abstract StaticData _StaticDate { get; }
+    public abstract void WriteInHololens(string message);
 }

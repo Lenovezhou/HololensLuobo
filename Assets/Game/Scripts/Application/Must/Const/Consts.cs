@@ -6,6 +6,11 @@ using UnityEngine;
 
 public static class Consts
 {
+
+    public const float RangeClosedDistance = 0.05f;
+    public const float DotClosedDistance = 0.05f;
+
+
     //目录
     public static readonly string LevelDir = Application.dataPath + @"\Game\Resources\Res\Levels";
     public static readonly string MapDir = Application.dataPath + @"\Game\Resources\Res\Maps";
@@ -29,7 +34,7 @@ public static class Consts
     public const string V_Sytem = "V_Sytem";
     public const string V_Complete = "V_Complete";
     public const string V_Spanwner = "V_Spanwner";
-    
+    public const string V_TowerCreator = "V_TowerCreator";
 
     //Controller
     public const string E_StartUp = "E_StartUp";
@@ -41,9 +46,22 @@ public static class Consts
     public const string E_EndLevel = "E_EndLevel";//EndLevelArgs
 
     public const string E_CountDownComplete = "E_CountDownComplete";
+    public const string E_Gold = "E_Gold";//Gold
 
     public const string E_StartRound = "E_StartRound";//StartRoundArgs
     public const string E_SpawnMonster = "E_SpawnMonster";//SpawnMonsterArgs
+    public const string E_SpawnTower = "E_SpawnTower";//spawntower;
+
+    public const string E_TowerCreator = "E_TowerCreator";//showORhideTowerCreator;
+
+    public const string E_ShowCreate = "E_ShowCreate";//E_ShowCreate
+    public const string E_ShowUpgrade = "E_ShowUpgrade";//E_ShowUpgrade
+    public const string E_HidePopup = "E_HidePopup";//E_HidePopup
+    public const string E_UpgradeTower = "E_UpgradeTower";//E_UpgradeTower
+    public const string E_SellTower = "E_SellTower";//E_SellTower
+
+    public const string E_UISystem = "E_UISystemHide";//E_UISystemHide
+
 }
 
 public enum GameSpeed

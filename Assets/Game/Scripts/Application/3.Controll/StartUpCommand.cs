@@ -17,6 +17,7 @@ class StartUpCommand : Controller
         RegisterController(Consts.E_StartLevel, typeof(StartLevelCommand));
         RegisterController(Consts.E_EndLevel, typeof(EndLevelCommand));
         RegisterController(Consts.E_CountDownComplete, typeof(CountDownCompleteCommand));
+        RegisterController(Consts.E_UISystem, typeof(PauseResumeController));
 
         ////初始化
         GameModel gModel = GetModel<GameModel>();

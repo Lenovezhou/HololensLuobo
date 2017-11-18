@@ -3,7 +3,11 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Map
+  - Monster
+  - Tower
+  - Bullet
   layers:
   - Default
   - TransparentFX
@@ -40,4 +44,28 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Background
+    uniqueID: 3504117813
+    locked: 0
+  - name: Road
+    uniqueID: 342704201
+    locked: 0
+  - name: Luobo
+    uniqueID: 1532381081
+    locked: 0
+  - name: Monster
+    uniqueID: 2508372431
+    locked: 0
+  - name: Tower
+    uniqueID: 882524347
+    locked: 0
+  - name: Bullet
+    uniqueID: 114057731
+    locked: 0
+  - name: Effect
+    uniqueID: 1957363051
+    locked: 0
+  - name: Interactive
+    uniqueID: 3955761695
     locked: 0
